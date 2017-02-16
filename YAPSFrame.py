@@ -131,8 +131,8 @@ class Photo(Frame):
         except:
             print("Could not open:" + photo_path)
             fp.close()
-            print("closed")
             self.flip()
+            return
             
         image_w = image1a.width
         image_h = image1a.height
