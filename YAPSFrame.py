@@ -10,6 +10,7 @@ from PIL import Image, ImageTk
 import locale
 import threading
 import time
+import random
 from contextlib import contextmanager
 
 
@@ -105,7 +106,19 @@ class Photo(Frame):
     
     def flip(self):
         #find a photo to display
-        photo_path = photo_dir + '/' + 'grace5.jpg'
+        photo_path = ''
+        while photo_path == '':
+            #get a random directory
+            randomDir = random.choice(dirs)
+            #get list of jpgs
+            print("rd" + randomDir)
+            try:
+                sharedphotos = conn.listPath(share_name, randomDir,pattern="*.jpg")
+            except:
+                continue
+            #pick one at random
+            photo = random.choice(sharedphotos)
+            photo_path = randomDir + '/' + photo.filename
 
         #read a photo to memory
         fp = io.BytesIO()
@@ -113,7 +126,14 @@ class Photo(Frame):
         fp.seek(0)
 
         #resize the photo and setup for display
-        image1a = Image.open(fp)
+        try:
+            image1a = Image.open(fp)
+        except:
+            print("Could not open:" + photo_path)
+            fp.close()
+            print("closed")
+            self.flip()
+            
         image_w = image1a.width
         image_h = image1a.height
         ratio = float(image_w)/float(image_h)
