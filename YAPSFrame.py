@@ -26,7 +26,7 @@ def GetDirs(conn, share, directory):
         if sharedfile.isDirectory:
             newdir = directory + '/' + sharedfile.filename
             dirs.append(newdir)
-            #dirs = dirs + GetDirs(conn, share, newdir)
+            dirs = dirs + GetDirs(conn, share, newdir)
     return dirs
 
 @contextmanager 
