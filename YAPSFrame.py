@@ -2,8 +2,10 @@ from smb.SMBConnection import SMBConnection
 import config
 import tempfile
 import io
-#from tkinter import *
-from Tkinter import *
+#for Python 3
+from tkinter import *
+#for Python 2.7
+#from Tkinter import *
 from PIL import Image, ImageTk
 #from smb import *
 #from SMBConnection import *
@@ -26,7 +28,7 @@ def GetDirs(conn, share, directory):
         if sharedfile.isDirectory:
             newdir = directory + '/' + sharedfile.filename
             dirs.append(newdir)
-            dirs = dirs + GetDirs(conn, share, newdir)
+            #dirs = dirs + GetDirs(conn, share, newdir)
     return dirs
 
 @contextmanager 
@@ -133,9 +135,9 @@ class Photo(Frame):
             fp.close()
             self.flip()
             return
-            
-        image_w = image1a.width
-        image_h = image1a.height
+        image_s = image1a.size    
+        image_w = image_s[0]
+        image_h = image_s[1]
         ratio = float(image_w)/float(image_h)
 
         if ratio < screen_ratio:  #height is the constraint
