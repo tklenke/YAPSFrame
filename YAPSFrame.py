@@ -9,11 +9,18 @@ from tkinter import *
 from PIL import Image, ImageTk
 #from smb import *
 #from SMBConnection import *
+from PIL.ExifTags import TAGS
 import locale
 import threading
 import time
 import random
 from contextlib import contextmanager
+
+#so we can break from a deep loop
+class ContinueI(Exception):
+    pass
+    
+continue_i = ContinueI()
 
 
 #--------functions
@@ -21,14 +28,21 @@ def GetDirs(conn, share, directory):
     print(directory)
     sharedfiles = conn.listPath(share_name, directory)
     dirs = []
+    skipdirs = config.skip_directories
     for sharedfile in sharedfiles:
-        #skip the built in directories
-        if sharedfile.filename == '.' or sharedfile.filename == '..':
+        try:
+            #skip 
+            for skipdir in skipdirs:
+                if sharedfile.filename == skipdir:
+                    raise continue_i
+        except ContinueI:
             continue
+            
         if sharedfile.isDirectory:
             newdir = directory + '/' + sharedfile.filename
             dirs.append(newdir)
-            #dirs = dirs + GetDirs(conn, share, newdir)
+            if config.recursive_dirs:
+                dirs = dirs + GetDirs(conn, share, newdir)
     return dirs
 
 @contextmanager 
@@ -40,7 +54,23 @@ def setlocale(name): #thread proof function to work with locale
         finally:
             locale.setlocale(locale.LC_ALL, saved)
 
+def getEXIF(img):
+    ret = {}
+    info = img._getexif()
+    if info is not None:
+        for tag, value in info.items():
+            decoded = TAGS.get(tag, tag)
+            ret[str(decoded).lower()] = value
+    return ret  
 
+def printEXIF(img):
+        tags = getEXIF(img)
+        try:
+            for tag, value in tags.items():
+                print("{" + str(tag) + "}[" + str(value) + "]\n")
+        except:
+            print("can't get EXIF information\n") 
+            
 
 #--------main
 LOCALE_LOCK = threading.Lock()
@@ -129,15 +159,40 @@ class Photo(Frame):
 
         #resize the photo and setup for display
         try:
-            image1a = Image.open(fp)
+            imageRaw = Image.open(fp)
         except:
             print("Could not open:" + photo_path)
             fp.close()
             self.flip()
             return
-        image_s = image1a.size    
+
+        #print exif info
+        exif = getEXIF(imageRaw)
+
+        if exif == None:
+            print("could not get exif for " + photo_path + "\n")
+        else:
+            image_date = exif.get('datetime',"")
+            image_orientation = exif.get('orientation',1)
+        
+        #rotate first    
+        if image_orientation == 3:
+            imageRot = imageRaw.rotate(180)
+            print("Rotating " + photo_path + "\n")
+        elif image_orientation == 6:
+            imageRot= imageRaw.rotate(270)
+            print("Rotating " + photo_path + "\n")
+        elif image_orientation == 8:
+            imageRot = imageRaw.rotate(90)
+            print("Rotating " + photo_path + "\n")
+        else:
+            imageRot = imageRaw
+
+        #now find the image aspect ratio and size
+        image_s = imageRot.size    
         image_w = image_s[0]
         image_h = image_s[1]
+
         ratio = float(image_w)/float(image_h)
 
         if ratio < screen_ratio:  #height is the constraint
@@ -147,8 +202,10 @@ class Photo(Frame):
             w = int(screen_width)
             h = int(w/ratio)
 
-        image1r = image1a.resize((w,h),Image.ANTIALIAS)
-        image1 = ImageTk.PhotoImage(image1r)
+        #then resize
+        imageRR = imageRot.resize((w,h),Image.ANTIALIAS)
+
+        image1 = ImageTk.PhotoImage(imageRR)
         fp.close()
 
         #show the photo
@@ -202,7 +259,7 @@ class FullscreenWindow:
 
     def __init__(self):
         self.tk = Tk()
-        self.tk.configure(background='black')
+        self.tk.configure(background='black',cursor="none")
         self.topFrame = Frame(self.tk, background = 'black')
         self.bottomFrame = Frame(self.tk, background = 'black')
         self.topFrame.pack(side = TOP, fill=BOTH, expand = YES)
