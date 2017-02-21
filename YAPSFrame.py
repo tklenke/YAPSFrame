@@ -76,8 +76,8 @@ def printEXIF(img):
 LOCALE_LOCK = threading.Lock()
 
 #set up constants
-screen_base_width = 1920
-screen_base_height = 1080
+screen_base_width = config.screen_width
+screen_base_height = config.screen_height
 screen_multiplier = 1 #/1.875
 screen_width = screen_base_width * screen_multiplier
 screen_height = screen_base_height * screen_multiplier
@@ -211,7 +211,7 @@ class Photo(Frame):
         #show the photo
         self.panel1.config(image=image1)
         self.panel1.image = image1  
-        self.after(200, self.flip)    
+        self.after(config.flip_after_secs*1000, self.flip)    
 
 class Clock(Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -261,9 +261,9 @@ class FullscreenWindow:
         self.tk = Tk()
         self.tk.configure(background='black',cursor="none")
         self.topFrame = Frame(self.tk, background = 'black')
-        self.bottomFrame = Frame(self.tk, background = 'black')
+        #self.bottomFrame = Frame(self.tk, background = 'black')
         self.topFrame.pack(side = TOP, fill=BOTH, expand = YES)
-        self.bottomFrame.pack(side = BOTTOM, fill=BOTH, expand = YES)
+        #self.bottomFrame.pack(side = BOTTOM, fill=BOTH, expand = YES)
         self.state = False
         self.tk.bind("<Return>", self.toggle_fullscreen)
         self.tk.bind("<Escape>", self.end_fullscreen)

@@ -1,5 +1,10 @@
 #rename this file to config.py and update with your information
 
+screen_width = 1920
+screen_height = 1080
+
+flip_after_secs = 45
+
 userID = "YOURINFO_HERE"
 password = "YOURINFO_HERE"
 client_machine_name = "YOURINFO_HERE"
