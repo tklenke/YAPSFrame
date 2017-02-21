@@ -1,8 +1,20 @@
-userID = "YOURINFO HERE"
-password = "YOURINFO HERE"
-client_machine_name = "YOURINFO HERE"
+#rename this file to config.py and update with your information
 
-server_name = "YOURINFO HERE"
-server_ip = "YOURINFO HERE"
+userID = "YOURINFO_HERE"
+password = "YOURINFO_HERE"
+client_machine_name = "YOURINFO_HERE"
 
-domain_name = "YOURINFO HERE"
+server_name = "CABRYOURINFO_HEREERA"
+server_ip = "YOURINFO_HERE"
+
+domain_name = "YOURINFO_HERE"
+
+#your smb share name
+share_name = "YOURINFO_HERE"
+photo_directory = "YOURINFO_HERE"
+
+#will recursively dig into your photo directory looking for photos
+recursive_dirs = True
+
+#add additional directories to skip by adding in quotes
+skip_directories =['.','..','YOURINFO_HERE']
