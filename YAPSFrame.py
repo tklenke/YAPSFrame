@@ -282,6 +282,7 @@ class FullscreenWindow:
         #~ # calender - removing for now
         #~ # self.calender = Calendar(self.bottomFrame)
         #~ # self.calender.pack(side = RIGHT, anchor=S, padx=100, pady=60)
+        self.toggle_fullscreen()
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state  # Just toggling the boolean
