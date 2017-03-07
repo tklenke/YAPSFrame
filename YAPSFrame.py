@@ -297,12 +297,16 @@ class Clock(Frame):
 class Calendar(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, bg='black')
-        self.title = 'Upcoming' 
+        if config.google_calendar_id != False:
+            self.title = 'Upcoming' 
+        else:
+            self.title = ""
         self.calendarLbl = Label(self, text=self.title, font=('Helvetica', large_text_size), fg="white", bg="black")
         self.calendarLbl.pack(side=TOP, anchor=W)
         self.eventsContainer = Frame(self, bg="black")
         self.eventsContainer.pack(side=TOP)
-        self.get_events()
+        if config.google_calendar_id != False:
+            self.get_events()
 
     def get_events(self):
         print("getting events")
@@ -383,7 +387,7 @@ class FullscreenWindow:
         # clock
         self.clock = Clock(self.topFrame)
         self.clock.pack(side=RIGHT, anchor=N, padx=0, pady=0)
-        # Calendar 
+        # Calendar
         self.calendar = Calendar(self.topFrame)
         self.calendar.pack(side = RIGHT, anchor=S, padx=0, pady=0)
         # Photo

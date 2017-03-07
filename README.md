@@ -15,6 +15,9 @@ sudo apt-get install python3-tk
 sudo apt-get install python3-pil.imagetk
 sudo pip3 install config
 sudo pip3 install pysmb
+sudo pip3 install feedparser
+sudo pip3 install httplib2
+sudo pip3 --upgrade google-api-python-client
 ```
 
 ##ToDo

@@ -23,3 +23,6 @@ recursive_dirs = True
 
 #add additional directories to skip by adding in quotes
 skip_directories =['.','..','YOURINFO_HERE']
+
+#put your calendar ID here, or False if you want to skip the calendar
+google_calendar_id = 'YOURINFO_HERE'
