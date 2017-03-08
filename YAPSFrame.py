@@ -115,10 +115,7 @@ def get_credentials():
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
+        credentials = tools.run_flow(flow, store, None)
         print('Storing credentials to ' + credential_path)
     return credentials
             
@@ -149,6 +146,7 @@ xlarge_text_size = 48
 large_text_size = 24
 medium_text_size = 16
 small_text_size = 8
+
 
 #for calendar
 # If modifying these scopes, delete your previously saved credentials
@@ -386,10 +384,10 @@ class FullscreenWindow:
         self.tk.bind('<Down>',self.show_cal)
         # clock
         self.clock = Clock(self.topFrame)
-        self.clock.pack(side=RIGHT, anchor=N, padx=0, pady=0)
+        self.clock.pack(side=RIGHT, anchor=N, padx=10, pady=0)
         # Calendar
         self.calendar = Calendar(self.topFrame)
-        self.calendar.pack(side = RIGHT, anchor=S, padx=0, pady=0)
+        self.calendar.pack(side = RIGHT, anchor=S, padx=20, pady=0)
         # Photo
         self.photo = Photo(self.topFrame)
         self.photo.pack(side=LEFT, anchor=N, padx=0, pady=0)
