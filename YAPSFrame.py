@@ -314,16 +314,6 @@ class Calendar(Frame):
             # remove all children
             for widget in self.eventsContainer.winfo_children():
                 widget.destroy()
-                
-            #~ events_url = "https://news.google.com/news?ned=us&output=rss"
-
-            #~ feed = feedparser.parse(events_url)
-
-            #~ for post in feed.entries[0:5]:
-                #~ eventFrame = calendarevent(self.eventsContainer, post.title)
-                #~ eventFrame.pack(side=TOP, anchor=W)
-                #~ print(event)
-                
 
             now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
             print('Getting the upcoming 10 events')
