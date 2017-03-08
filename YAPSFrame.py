@@ -176,6 +176,8 @@ class Photo(Frame):
             print("rd" + randomDir)
             try:
                 sharedphotos = conn.listPath(share_name, randomDir,pattern="*.jpg")
+                if sharedphotos == None:
+                    continue
             except:
                 continue
             #pick one at random
