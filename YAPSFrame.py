@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from contextlib import contextmanager
 import config
 import locale
@@ -24,13 +26,11 @@ import io
 import feedparser
 
 #for calendar
-import httplib2
 import os
-from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
 import datetime
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file, client, tools
 
 #so we can break from a deep loop
 class ContinueI(Exception):
@@ -93,31 +93,6 @@ def suffix(d):
 
 def custom_strftime(format, t):
     return t.strftime(format).replace('{S}', str(t.day) + suffix(t.day))
-
-def get_credentials():
-    """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'calendar-python-quickstart.json')
-
-    store = Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store, None)
-        print('Storing credentials to ' + credential_path)
-    return credentials
             
 
 #--------main
@@ -317,10 +292,12 @@ class Calendar(Frame):
 
             now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
             print('Getting the upcoming 10 events')
-            eventsResult = service.events().list(
-                calendarId=config.google_calendar_id, timeMin=now, maxResults=10, singleEvents=True,
-                orderBy='startTime').execute()
-            events = eventsResult.get('items', [])
+            now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+            print('Getting the upcoming 10 events')
+            events_result = service.events().list(calendarId=config.google_calendar_id, timeMin=now,
+                                                maxResults=10, singleEvents=True,
+                                                orderBy='startTime').execute()
+            events = events_result.get('items', [])
 
             if not events:
                 eventFrame = calendarevent(self.eventsContainer, "No upcoming events found")
@@ -417,9 +394,19 @@ class FullscreenWindow:
 if __name__ == '__main__':
     #do calendar set-up
     print("setting up Google Calendar connection")
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+    credential_path = os.path.join(credential_dir,
+                                   'calendar-python-quickstart.json')
+
+    store = file.Storage('token.json')
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets(credential_path, SCOPES)
+        creds = tools.run_flow(flow, store)
+    service = build('calendar', 'v3', http=creds.authorize(Http()))
 
     #set up connection
     userID = config.userID
